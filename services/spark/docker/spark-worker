@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -e
+
+unset SPARK_MASTER_PORT
+
+if [ "$#" != "3" ]; then
+  echo "ERROR: Missing required arguments"
+  echo "Expecting ./spark-worker --master-hostname=<fully qualified hostname> --master-port=<master service port> --webui-port=<worker webui port>"
+  echo "Got: $@"
+fi
+
+for i in "$@"
+do
+case $i in
+    -p=*|--master-port=*)
+    SERVICE_PORT="${i#*=}"
+    echo "MasterPort is $SERVICE_PORT"
+    ;;
+    -w=*|--webui-port=*)
+    WEBUI_PORT="${i#*=}"
+    echo "WebUIPort is $WEBUI_PORT"
+    ;;
+    -m=*|--master-hostname=*)
+    MASTER_HOSTNAME="${i#*=}"
+    echo "MasterHostname is $MASTER_HOSTNAME"
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+done
+
+MASTER_SERVICE_PORT=$SERVICE_PORT
+
+echo "Validating $MASTER_HOSTNAME"
+if ! getent hosts $MASTER_HOSTNAME; then
+  echo "=== Cannot resolve the DNS entry for spark-master"
+  exit 1
+fi
+
+# Run spark-class directly so that when it exits (or crashes), the pod restarts.
+$SPARK_HOME/bin/spark-class org.apache.spark.deploy.worker.Worker --webui-port $WEBUI_PORT spark://$MASTER_HOSTNAME:${MASTER_SERVICE_PORT}

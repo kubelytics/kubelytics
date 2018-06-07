@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -e
+
+unset SPARK_MASTER_PORT
+
+if [ "$#" != "3" ]; then
+  echo "ERROR: Missing required arguments"
+  echo "Expecting ./spark-master --service-port=<master service port> --webui-port=<master webui service port> --master-hostname=<fully qualified hostname>"
+  echo "Got: $@"
+fi
+
+for i in "$@"
+do
+case $i in
+    -s=*|--service-port=*)
+    MASTER_SERVICE_PORT="${i#*=}"
+    echo "ServicePort is $MASTER_SERVICE_PORT"
+    ;;
+    -w=*|--webui-port=*)
+    WEBUI_PORT="${i#*=}"
+    echo "WebUIPort is $WEBUI_PORT"
+    ;;
+    -m=*|--master-hostname=*)
+    MASTER_HOSTNAME="${i#*=}"
+    echo "MasterHostname is $MASTER_HOSTNAME"
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+done
+
+export SPARK_MASTER_HOST=$MASTER_HOSTNAME
+export SPARK_MASTER_PORT=$MASTER_SERVICE_PORT
+
+$SPARK_HOME/bin/spark-class org.apache.spark.deploy.master.Master --host $(hostname) --port $MASTER_SERVICE_PORT --webui-port $WEBUI_PORT
