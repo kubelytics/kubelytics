@@ -1,0 +1,6 @@
+dependencies:
+- name: presto
+  repository: file://../presto
+  version: "0.2"
+digest: sha256:e1a6a9be44d405e094e33b9228bfcbf5c7986a9d2ac14ce1fed83de6fa89a4da
+generated: 2018-06-10T17:28:45.635746756+03:00
