@@ -1,0 +1,66 @@
+server:
+  workers: 2
+  node:
+    environment: production
+    dataDir: /presto/etc/data
+  log:
+    com.facebook.presto: INFO
+  config:
+    mapPath: /etc/config/presto
+    path: /presto/etc
+    http:
+      port: 8080
+    query:
+      maxMemory: "4GB"
+      maxMemoryPerNode: "1GB"
+    extra: {}
+
+  jvm:
+    maxHeapSize: "8G"
+    gcMethod: 
+      type: "UseG1GC"
+      g1:
+        heapRegionSize: "32M"
+
+image:
+  repository: kubelytics/presto
+  tag: 0.189
+  pullPolicy: IfNotPresent
+  command: /etc/config/presto/docker-presto.sh
+
+service:
+  type: ClusterIP
+
+environment: {}
+
+volumes: {}
+  #  coordinator:
+  #    - name: vol1
+  #      path:
+  #        hostPath:
+  #          path: /tmp/vol1
+  #      mount: /vol1
+  #  worker:
+  #    - name: vol2
+  #      path:
+  #        hostPath:
+  #          path: /tmp/vol2
+  #      mount: /vol2
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

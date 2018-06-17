@@ -1,0 +1,77 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "presto.coordinator" . }}
+  labels:
+    app: {{ template "presto.name" . }}
+    chart: {{ template "presto.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: coordinator
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "presto.name" . }}
+      release: {{ .Release.Name }}
+      component: coordinator
+  template:
+    metadata:
+      labels:
+        app: {{ template "presto.name" . }}
+        release: {{ .Release.Name }}
+        component: coordinator
+    spec:
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ template "presto.coordinator" . }}
+{{- if .Values.volumes }}
+{{- range $i, $vol := .Values.volumes.coordinator }}
+        - name: {{ $vol.name }}
+{{ toYaml $vol.path | trim | indent 10 }}
+{{- end }}
+{{- end }}
+      containers:
+        - name: {{ .Chart.Name }}-coordinator
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/bash", "-x", "{{ .Values.image.command }}"]
+{{- if .Values.environment }}
+          env:
+{{ toYaml .Values.environment | trim | indent 12 }}
+{{- end }}
+          volumeMounts:
+            - mountPath: {{ .Values.server.config.mapPath }}
+              name: config-volume
+{{- if .Values.volumes }}
+{{- range $i, $vol := .Values.volumes.coordinator }}
+            - name: {{ $vol.name }}
+              mountPath: {{ $vol.mount }}
+{{- end }}
+{{- end }}
+          ports:
+            - name: http-coord
+              containerPort: {{ .Values.server.config.http.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /v1/cluster
+              port: http-coord
+          readinessProbe:
+            httpGet:
+              path: /v1/cluster
+              port: http-coord
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
