@@ -2,5 +2,8 @@ dependencies:
 - name: presto
   repository: file://../presto
   version: "0.2"
-digest: sha256:e1a6a9be44d405e094e33b9228bfcbf5c7986a9d2ac14ce1fed83de6fa89a4da
-generated: 2018-06-10T17:28:45.635746756+03:00
+- name: v3io-configs
+  repository: https://v3io.github.io/helm-charts/stable
+  version: 0.1.0
+digest: sha256:e4c084c5306c88c961b9f3b8dfc2178afaabfb4996f44ab60f75139d6c9f7e18
+generated: 2018-06-20T16:58:55.481785756+03:00

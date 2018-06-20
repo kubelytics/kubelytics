@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-v3io-config
+  labels:
+    app: {{ template "presto.name" . }}
+    chart: {{ template "presto.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+{{ include "v3io-configs.java.configMap" . | indent 2 }}
+
+  v3io-presto.sh: |
+    #!/usr/bin/env bash
+    set -e
+
+{{ include "v3io-configs.script.lookupService" . | indent 4 }}
+
+    /bin/bash -x {{ .Values.presto.config.mapPath }}/docker-presto.sh
+
+---

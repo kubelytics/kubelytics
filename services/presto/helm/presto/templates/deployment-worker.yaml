@@ -28,10 +28,7 @@ spec:
           configMap:
             name: {{ template "presto.worker" . }}
 {{- if .Values.volumes }}
-{{- range $i, $vol := .Values.volumes.worker }}
-        - name: {{ $vol.name }}
-{{ toYaml $vol.path | trim | indent 10 }}
-{{- end }}
+{{ include .Values.volumes.worker.volumesTemplate . | indent 8 }}
 {{- end }}
       containers:
         - name: {{ .Chart.Name }}-worker
@@ -40,16 +37,13 @@ spec:
           command: ["/bin/bash", "-x", "{{ .Values.image.command }}"]
 {{- if .Values.environment }}
           env:
-{{ toYaml .Values.environment | trim | indent 12 }}
+{{ include .Values.environment.template . | indent 12 }}
 {{- end }}
           volumeMounts:
             - mountPath: {{ .Values.server.config.mapPath }}
               name: config-volume
 {{- if .Values.volumes }}
-{{- range $i, $vol := .Values.volumes.worker }}
-            - name: {{ $vol.name }}
-              mountPath: {{ $vol.mount }}
-{{- end }}
+{{ include .Values.volumes.worker.volumeMountsTemplate . | indent 12 }}
 {{- end }}
           livenessProbe:
             exec:

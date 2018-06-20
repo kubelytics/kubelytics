@@ -13,46 +13,23 @@ presto:
     command: /etc/config/v3io/v3io-presto.sh
 
   environment:
-    - name: CURRENT_NODE_IP
-      valueFrom:
-        fieldRef:
-          fieldPath: status.hostIP
+    template: v3io-configs.deployment.env
 
   volumes:
     coordinator:
-      - name: shm
-        path:
-          hostPath:
-            path: /dev/shm
-        mount: /dev/shm
-      - name: daemon-comm
-        path:
-          hostPath:
-            path: /tmp/dayman
-        mount: /tmp/dayman
-      - name: v3io-presto-config-volume
-        path:
-          configMap:
-            name: v3io-presto-script
-        mount: /etc/config/v3io
+      volumesTemplate: v3io-configs.deployment.mount
+      volumeMountsTemplate: v3io-configs.deployment.volumeMounts
     worker:
-      - name: shm
-        path:
-          hostPath:
-            path: /dev/shm
-        mount: /dev/shm
-      - name: daemon-comm
-        path:
-          hostPath:
-            path: /tmp/dayman
-        mount: /tmp/dayman
-      - name: v3io-presto-config-volume
-        path:
-          configMap:
-            name: v3io-presto-script
-        mount: /etc/config/v3io
+      volumesTemplate: v3io-configs.deployment.mount
+      volumeMountsTemplate: v3io-configs.deployment.volumeMounts
+
+nameOverride: presto
+
+global:
+  v3io:
+    configPath: /etc/config/v3io
 
 v3io:
-  daemonLookupServiceHost: local-registry
-  daemonLookupServicePort: 8080
-  daemonLookupServicePath: registry/daemon
+  username: iguazio
+  tenant: iguazio
+  password: iguazio

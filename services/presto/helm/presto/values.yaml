@@ -35,17 +35,11 @@ environment: {}
 
 volumes: {}
   #  coordinator:
-  #    - name: vol1
-  #      path:
-  #        hostPath:
-  #          path: /tmp/vol1
-  #      mount: /vol1
+  #    volumesVar: myPrestoVolumesTemplate
+  #    volumeMountsVar: myPrestoVolumeMountssTemplate
   #  worker:
-  #    - name: vol2
-  #      path:
-  #        hostPath:
-  #          path: /tmp/vol2
-  #      mount: /vol2
+  #    volumesVar: myPrestoVolumesTemplate
+  #    volumeMountsVar: myPrestoVolumeMountssTemplate
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

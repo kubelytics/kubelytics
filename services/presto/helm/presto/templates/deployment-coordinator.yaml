@@ -26,10 +26,7 @@ spec:
           configMap:
             name: {{ template "presto.coordinator" . }}
 {{- if .Values.volumes }}
-{{- range $i, $vol := .Values.volumes.coordinator }}
-        - name: {{ $vol.name }}
-{{ toYaml $vol.path | trim | indent 10 }}
-{{- end }}
+{{ include .Values.volumes.coordinator.volumesTemplate . | indent 8 }}
 {{- end }}
       containers:
         - name: {{ .Chart.Name }}-coordinator
@@ -38,16 +35,13 @@ spec:
           command: ["/bin/bash", "-x", "{{ .Values.image.command }}"]
 {{- if .Values.environment }}
           env:
-{{ toYaml .Values.environment | trim | indent 12 }}
+{{ include .Values.environment.template . | indent 12 }}
 {{- end }}
           volumeMounts:
             - mountPath: {{ .Values.server.config.mapPath }}
               name: config-volume
 {{- if .Values.volumes }}
-{{- range $i, $vol := .Values.volumes.coordinator }}
-            - name: {{ $vol.name }}
-              mountPath: {{ $vol.mount }}
-{{- end }}
+{{ include .Values.volumes.coordinator.volumeMountsTemplate . | indent 12 }}
 {{- end }}
           ports:
             - name: http-coord
