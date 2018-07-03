@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "spark.worker-name" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: spark-worker
+data:
+  run.sh: |
+    #!/usr/bin/env bash
+    set -e
+
+    /spark-worker \
+      --master-port={{ .Values.master.servicePort }} \
+      --webui-port={{ .Values.master.webAdmin.servicePort }} \
+      --master-hostname={{ template "spark.master-name" . }}

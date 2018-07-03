@@ -1,0 +1,15 @@
+1. Get the Spark URL to visit by running these commands in the same shell:
+
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+  You can watch the status of by running 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "spark.webui-name" . }}'
+
+  export SPARK_SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "spark.webui-name" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SPARK_SERVICE_IP:{{ .Values.master.webAdmin.servicePort }}
+
+2. Get the Zeppelin URL to visit by running these commands in the same shell:
+
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+  You can watch the status of by running 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "spark.zeppelin-name" . }}'
+
+  export ZEPPELIN_SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "spark.zeppelin-name" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$ZEPPELIN_SERVICE_IP:{{ .Values.zeppelin.servicePort }}

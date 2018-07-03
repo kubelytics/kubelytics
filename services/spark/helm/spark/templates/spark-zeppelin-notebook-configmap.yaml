@@ -1,0 +1,87 @@
+{{- if .Values.zeppelin.preloadNotebooks.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: {{ template "spark.zeppelin-name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: zeppelin
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "spark.zeppelin-name" . }}-notebooks
+data:
+{{- range $i, $notebook := .Values.zeppelin.preloadNotebooks.notebooks }}
+{{- with randAlphaNum 9 }}
+{{ . | indent 2 }}: |
+    {
+    "paragraphs": [
+{{- if (ne "" $notebook.documentation) -}}
+        {
+        "text": {{ printf "%%md\n%s" $notebook.documentation | quote }},
+        "user": "anonymous",
+        "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+            "language": "markdown"
+            },
+            "editorMode": "ace/mode/markdown"
+        },
+        "settings": {
+            "params": {},
+            "forms": {}
+        },
+        "apps": [],
+        "jobName": "paragraph_{{ randNumeric 13 }}_{{ randNumeric 9 }}",
+        "id": "{{ date "20060102-150405" now }}_{{ randNumeric 9 }}",
+        "dateCreated": "{{ date "2006-01-02 15:04:05.999" now }}",
+        "dateUpdated": "{{ date "2006-01-02 15:04:05.999" now }}",
+        "dateStarted": "{{ date "2006-01-02 15:04:05.999" now }}",
+        "dateFinished": "{{ date "2006-01-02 15:04:05.999" now }}",
+        "status": "FINISHED",
+        "errorMessage": "",
+        "progressUpdateIntervalMs": 500
+        }{{ if (gt (len $notebook.sections) 0) }},{{ end }}
+{{- end -}}
+{{- range $j, $section := $notebook.sections }}
+        {
+        "text": {{ $section.content | quote }},
+        "user": "anonymous",
+        "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+            "language": "{{ $section.language }}"
+            },
+            "editorMode": "ace/mode/{{ $section.language }}"
+        },
+        "settings": {
+            "params": {},
+            "forms": {}
+        },
+        "apps": [],
+        "jobName": "paragraph_{{ randNumeric 13 }}_{{ randNumeric 9 }}",
+        "id": "{{ date "20060102-150405" now }}_{{ randNumeric 9 }}",
+        "dateCreated": "{{ date "2006-01-02 15:04:05.999" now }}",
+        "dateUpdated": "{{ date "2006-01-02 15:04:05.999" now }}",
+        "dateStarted": "{{ date "2006-01-02 15:04:05.999" now }}",
+        "dateFinished": "{{ date "2006-01-02 15:04:05.999" now }}",
+        "status": "FINISHED",
+        "errorMessage": "",
+        "progressUpdateIntervalMs": 500
+        }{{ if (lt $j (sub (len $notebook.sections) 1)) }},{{ end }}
+{{- end }}
+    ],
+    "name": "{{ $notebook.title }}",
+    "id": "{{ . }}",
+    "config": {
+        "looknfeel": "default",
+        "personalizedMode": "false"
+    },
+    "info": {}
+    }
+{{ end -}}
+{{ end -}}
+{{- end -}}

@@ -1,0 +1,62 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "spark.worker-name" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: spark-worker
+spec:
+  securityContext:
+    fsGroup: 1000
+  replicas: {{ .Values.worker.replicas }}
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+      component: spark-worker
+  template:
+    metadata:
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        component: spark-worker
+    spec:
+      containers:
+        - name: {{ template "spark.worker-name" . }}
+          image: {{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag }}
+          imagePullPolicy: {{ .Values.worker.image.pullPolicy | quote }}
+          volumeMounts:
+            - mountPath: /etc/config/spark
+              name: spark-worker-config
+{{- if .Values.debug.enabled }}
+            - mountPath: /spark/conf
+              name: spark-debug-config
+{{- end }}
+{{- if .Values.volumes }}
+{{ include .Values.volumes.worker.volumeMountsTemplate . | indent 12 }}
+{{- end }}
+          command: ["/bin/bash", "-x", "{{ .Values.worker.image.command }}"]
+          ports:
+            - containerPort: {{ .Values.worker.containerPort }}
+          resources:
+{{ toYaml .Values.worker.resources | indent 12 }}
+{{- if .Values.environment }}
+          env:
+{{ include .Values.environment.template . | indent 12 }}
+{{- end }}
+      volumes:
+{{- if .Values.volumes }}
+{{ include .Values.volumes.worker.volumesTemplate . | indent 8 }}
+{{- end }}
+        - name: spark-worker-config
+          configMap:
+            name: {{ template "spark.worker-name" . }}
+{{- if .Values.debug.enabled }}
+        - name: spark-debug-config
+          configMap:
+            name: {{ .Release.Name }}-spark-debug-config
+{{- end }}

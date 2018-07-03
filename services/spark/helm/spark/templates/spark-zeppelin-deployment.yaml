@@ -1,0 +1,85 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "spark.zeppelin-name" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: zeppelin
+spec:
+  securityContext:
+    fsGroup: 1000
+  replicas: {{ .Values.zeppelin.replicas }}
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+      component: zeppelin
+  template:
+    metadata:
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        component: zeppelin
+    spec:
+      containers:
+        - name: {{ template "spark.zeppelin-name" . }}
+          image: {{ .Values.zeppelin.image.repository }}:{{ .Values.zeppelin.image.tag }}
+          imagePullPolicy: {{ .Values.zeppelin.image.pullPolicy | quote }}
+          command: ["/bin/bash"]
+          args:
+            - {{ .Values.zeppelin.image.command }}
+          ports:
+            - containerPort: {{ .Values.zeppelin.containerPort }}
+          resources:
+{{ toYaml .Values.zeppelin.resources | indent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.zeppelin.containerPort }}
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.zeppelin.containerPort }}
+            initialDelaySeconds: 90
+          env:
+            - name: MASTER
+              value: spark://{{ template "spark.master-name" . }}:{{ .Values.master.servicePort }}
+{{- if .Values.environment }}
+{{ include .Values.environment.template . | indent 12 }}
+{{- end }}
+          volumeMounts:
+            - mountPath: /etc/config/zeppelin
+              name: spark-zeppelin-config
+{{- if .Values.debug.enabled }}
+            - mountPath: /spark/conf
+              name: spark-debug-config
+{{- end }}
+{{- if .Values.volumes }}
+{{ include .Values.volumes.zeppelin.volumeMountsTemplate . | indent 12 }}
+{{- end }}
+{{- if .Values.zeppelin.preloadNotebooks.enabled }}
+            - mountPath: /etc/config/zeppelin/notebooks
+              name: notebook-volume
+{{- end }}        
+      volumes:
+{{- if .Values.volumes }}
+{{ include .Values.volumes.zeppelin.volumesTemplate . | indent 8 }}
+{{- end }}
+        - name: spark-zeppelin-config
+          configMap:
+            name: {{ template "spark.zeppelin-name" . }}
+{{- if .Values.debug.enabled }}
+        - name: spark-debug-config
+          configMap:
+            name: {{ .Release.Name }}-spark-debug-config
+{{- end }}
+{{- if .Values.zeppelin.preloadNotebooks.enabled }}
+        - name: notebook-volume
+          configMap:
+            name: {{ template "spark.zeppelin-name" . }}-notebooks
+{{- end }}              

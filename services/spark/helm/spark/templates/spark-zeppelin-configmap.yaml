@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "spark.zeppelin-name" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: zeppelin
+data:
+  run.sh : |
+    #!/bin/bash
+{{- if .Values.zeppelin.preloadNotebooks.enabled }}
+    for notebook in $(ls /etc/config/zeppelin/notebooks); do 
+      mkdir -p ${ZEPPELIN_HOME}/notebook/$notebook; 
+      cp /etc/config/zeppelin/notebooks/$notebook ${ZEPPELIN_HOME}/notebook/$notebook/note.json; 
+    done
+{{- end }}
+    /docker-zeppelin.sh \
+            --master-hostname={{ template "spark.master-name" . }} \
+            --master-port={{ .Values.master.servicePort }}

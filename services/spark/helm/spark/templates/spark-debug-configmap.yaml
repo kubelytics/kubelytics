@@ -1,0 +1,23 @@
+{{- if .Values.debug.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-spark-debug-config
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+data:
+  log4j.properties: |
+    # Root logger option
+    log4j.rootLogger=DEBUG, stdout
+    # Direct log messages to stdout
+    log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+    log4j.appender.stdout.Target=System.out
+    log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+    log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss,SSS} [%-20t] [%-5p] [%-40c{3}:%-4L] - %m%n
+    # Configure logging levels for specific packages
+{{- range $key, $val := .Values.debug.log }}
+{{ printf "log4j.logger.%s=%s" $key $val | indent 4}}
+{{- end }}
+{{- end -}}

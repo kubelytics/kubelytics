@@ -1,7 +1,7 @@
 dependencies:
-- name: presto
-  version: "0.2"
-  repository: "file://../presto"
+- name: spark
+  version: "0.4"
+  repository: "file://../spark"
 - name: v3io-configs
   version: "0.3.0"
   repository: https://v3io.github.io/helm-charts/stable

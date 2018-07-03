@@ -1,0 +1,9 @@
+dependencies:
+- name: spark
+  repository: file://../spark
+  version: "0.4"
+- name: v3io-configs
+  repository: https://v3io.github.io/helm-charts/stable
+  version: 0.3.0
+digest: sha256:1c976df09b55e3cc67c1627df8f90fe40496eb7af06f363b0fb9fe1f15d00200
+generated: 2018-06-27T15:34:31.968506031+03:00

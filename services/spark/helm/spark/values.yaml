@@ -1,0 +1,84 @@
+master:
+  image:
+    repository: "kubelytics/spark"
+    tag: "2.1.2"
+    pullPolicy: "IfNotPresent"
+    command: /etc/config/spark/run.sh
+  replicas: 1
+  servicePort: 7077
+  containerPort: 7077
+  
+  resources: {}
+    # limits:
+      # cpu: 1
+      # memory: "3Gi"
+    # requests:
+      # cpu: 1
+      # memory: "3Gi"
+  
+  webAdmin:
+    servicePort: 8080
+    containerPort: 8080
+
+worker:
+  image:
+    repository: "kubelytics/spark"
+    tag: "2.1.2"
+    pullPolicy: "IfNotPresent"
+    command: /etc/config/spark/run.sh
+  replicas: 1
+  containerPort: 8081
+  executorMemory: "1g"
+  
+  resources: {}
+    # limits:
+      # cpu: 1
+      # memory: "4Gi"
+    # requests:
+      # cpu: 1
+      # memory: "4Gi"
+
+zeppelin:
+  image:
+    repository: "kubelytics/zeppelin"
+    tag: "0.7.3"
+    pullPolicy: "IfNotPresent"
+    command: /etc/config/zeppelin/run.sh
+  replicas: 1
+  servicePort: 8080
+  containerPort: 8080
+  # nodePort: 32100
+  
+  resources: {}
+    # limits:
+      # cpu: 1
+      # memory: "2Gi"
+    # requests:
+      # cpu: 1
+      # memory: "2Gi"
+
+  preloadNotebooks:
+    enabled: true
+    notebooks: {}
+    # - title: "Demo Notebook"
+    #   documentation: |-
+    #     ## Title ##
+    #     This section actually supports Markdown syntax!
+    #   sections:
+    #   - language: scala
+    #     content: |-
+    #       import org.apache.spark.sql.types._
+    #       import org.apache.spark.sql.functions._
+    #       val schema = StructType(List(
+    #               StructField("__name", StringType),
+    #               StructField("count", LongType)
+    #           ))
+    #       val df = sqlContext.read
+    #                   .schema(schema)
+    #                   .load("/data")
+    #       df.where($"count" > 10).orderBy(desc("count")).show()
+
+debug:
+  enabled: false
+  log: {}
+  # com.acme.path: DEBUG

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-v3io-config
+  labels:
+    app: {{ template "spark.v3io.name" . }}
+    chart: {{ template "spark.v3io.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+{{ include "v3io-configs.java.configMap" . | indent 2 }}
+
+  v3io-spark.sh: |
+    #!/usr/bin/env bash
+    set -e
+
+{{ include "v3io-configs.script.lookupService" . | indent 4 }}
+
+    /bin/bash -x /etc/config/spark/run.sh
+
+  v3io-zeppelin.sh: |
+    #!/usr/bin/env bash
+    set -e
+
+{{ include "v3io-configs.script.lookupService" . | indent 4 }}
+
+    /bin/bash -x /etc/config/zeppelin/run.sh
+
+---

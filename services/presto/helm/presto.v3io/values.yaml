@@ -9,7 +9,7 @@ presto:
 
   image:
     repository: iguaziodocker/presto
-    tag: 0.189-1.5.2
+    tag: 0.189-1.7.0-b80
     command: /etc/config/v3io/v3io-presto.sh
 
   environment:
@@ -27,7 +27,7 @@ nameOverride: presto
 
 global:
   v3io:
-    configPath: /etc/config/v3io
+    configMountPath: /etc/config/v3io
 
 v3io:
   username: iguazio

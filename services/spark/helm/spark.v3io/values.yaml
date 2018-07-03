@@ -1,0 +1,43 @@
+spark:
+  master:
+    image:
+      repository: "iguaziodocker/spark"
+      tag: "2.1.2-1.7.0-b80"
+      command: /etc/config/v3io/v3io-spark.sh
+  
+  worker:
+    image:
+      repository: "iguaziodocker/spark"
+      tag: "2.1.2-1.7.0-b80"
+      command: /etc/config/v3io/v3io-spark.sh
+
+  zeppelin:
+    image:
+      repository: "iguaziodocker/zeppelin"
+      tag: "0.7.3-1.7.0-b80"
+      command: /etc/config/v3io/v3io-zeppelin.sh
+
+  environment:
+    template: v3io-configs.deployment.env
+
+  volumes:
+    master:
+      volumesTemplate: v3io-configs.deployment.mount
+      volumeMountsTemplate: v3io-configs.deployment.volumeMounts
+    worker:
+      volumesTemplate: v3io-configs.deployment.mount
+      volumeMountsTemplate: v3io-configs.deployment.volumeMounts
+    zeppelin:
+      volumesTemplate: v3io-configs.deployment.mount
+      volumeMountsTemplate: v3io-configs.deployment.volumeMounts
+
+nameOverride: spark
+
+global:
+  v3io:
+    configMountPath: /etc/config/v3io
+
+v3io:
+  username: iguazio
+  tenant: iguazio
+  password: iguazio
