@@ -4,12 +4,12 @@ set -e
 
 DOCKER_USER="kubelytics"
 
-BASE_DOCKER_VERSION=${BASE_DOCKER_VERSION:-"1"}
+BASE_DOCKER_VERSION=${BASE_DOCKER_VERSION:-"2.0.0"}
 
-HADOOP_VERSION=${HADOOP_VERSION:-"2.7.6"}
+HADOOP_VERSION=${HADOOP_VERSION:-"2.9.0"}
 HADOOP_FULL_VERSION="hadoop-${HADOOP_VERSION}"
 
-SPARK_VERSION=${SPARK_VERSION:-"2.1.2"}
+SPARK_VERSION=${SPARK_VERSION:-"2.2.1"}
 SPARK_FULL_VERSION="spark-${SPARK_VERSION}"
 
 ZEPPELIN_VERSION=${ZEPPELIN_VERSION:-"0.7.3"}
@@ -36,7 +36,8 @@ case $i in
 esac
 done
 
-TEMP_DIR=$(mktemp -d -t docker_stack_build)
+TEMP_DIR=$(mktemp -d -t docker_stack_buildXXXX)
+BUILD_LOG=${BUILD_LOG:-"${TEMP_DIR}/docker.build.log"}
 
 echo "  
 Starting Docker Release
@@ -53,86 +54,88 @@ Starting Docker Release
 
 echo "
 - Building Base ${DOCKER_USER}/base:${BASE_DOCKER_VERSION}"
-pushd base >> ${TEMP_DIR}/docker.base.${BASE_DOCKER_VERSION} 2>&1
+pushd base >> ${BUILD_LOG} 2>&1
 docker build \
-        --tag ${DOCKER_USER}/base:${BASE_DOCKER_VERSION} . >> ${TEMP_DIR}/docker.base.${BASE_DOCKER_VERSION} 2>&1
+        --tag ${DOCKER_USER}/base:${BASE_DOCKER_VERSION} . >> ${BUILD_LOG} 2>&1
 
-popd >> ${TEMP_DIR}/docker.base.${BASE_DOCKER_VERSION} 2>&1
+popd >> ${BUILD_LOG} 2>&1
 
 echo "
 - Building Hadoop ${DOCKER_USER}/hadoop:${HADOOP_VERSION}"
-pushd hadoop/docker >> ${TEMP_DIR}/docker.hadoop.${HADOOP_VERSION} 2>&1
+pushd hadoop/docker >> ${BUILD_LOG} 2>&1
 docker build \
         --build-arg DOCKER_USER=${DOCKER_USER} \
         --build-arg BASE_DOCKER_VERSION=${BASE_DOCKER_VERSION} \
         --build-arg HADOOP_VERSION=${HADOOP_FULL_VERSION} \
-        --tag ${DOCKER_USER}/hadoop:${HADOOP_VERSION} . >> ${TEMP_DIR}/docker.hadoop.${HADOOP_VERSION} 2>&1
+        --tag ${DOCKER_USER}/hadoop:${HADOOP_VERSION} . >> ${BUILD_LOG} 2>&1
 
-popd >> ${TEMP_DIR}/docker.hadoop.${HADOOP_VERSION} 2>&1
+popd >> ${BUILD_LOG} 2>&1
 
 echo "
-- Building Spark ${DOCKER_USER}/spark:${SPARK_VERSION}"
-pushd spark/docker >> ${TEMP_DIR}/docker.spark.${SPARK_VERSION} 2>&1
+- Building Spark ${DOCKER_USER}/spark:${SPARK_VERSION}-${HADOOP_VERSION}"
+pushd spark/docker >> ${BUILD_LOG} 2>&1
 docker build \
         --build-arg DOCKER_USER=${DOCKER_USER} \
         --build-arg HADOOP_VERSION=${HADOOP_VERSION} \
         --build-arg SPARK_VERSION=${SPARK_FULL_VERSION} \
-        --tag ${DOCKER_USER}/spark:${SPARK_VERSION} . >> ${TEMP_DIR}/docker.spark.${SPARK_VERSION} 2>&1
+        --tag ${DOCKER_USER}/spark:${SPARK_VERSION}-${HADOOP_VERSION} . >> ${BUILD_LOG} 2>&1
 
-popd >> ${TEMP_DIR}/docker.spark.${SPARK_VERSION} 2>&1
+popd >> ${BUILD_LOG} 2>&1
 
 echo "
-- Building Zeppelin ${DOCKER_USER}/zeppelin:${ZEPPELIN_VERSION}"
-pushd zeppelin/docker >> ${TEMP_DIR}/docker.zeppelin.${ZEPPELIN_VERSION} 2>&1
+- Building Zeppelin ${DOCKER_USER}/zeppelin:${ZEPPELIN_VERSION}-${SPARK_VERSION}"
+pushd zeppelin/docker >> ${BUILD_LOG} 2>&1
 docker build \
         --build-arg DOCKER_USER=${DOCKER_USER} \
+        --build-arg HADOOP_VERSION=${HADOOP_VERSION} \
         --build-arg SPARK_VERSION=${SPARK_VERSION} \
         --build-arg ZEPPELIN_VERSION=${ZEPPELIN_VERSION} \
-        --tag ${DOCKER_USER}/zeppelin:${ZEPPELIN_VERSION} . >> ${TEMP_DIR}/docker.zeppelin.${ZEPPELIN_VERSION} 2>&1
+        --tag ${DOCKER_USER}/zeppelin:${ZEPPELIN_VERSION}-${SPARK_VERSION}-${HADOOP_VERSION} . >> ${BUILD_LOG} 2>&1
 
-popd >> ${TEMP_DIR}/docker.zeppelin.${ZEPPELIN_VERSION} 2>&1
+popd >> ${BUILD_LOG} 2>&1
 
 echo "
-- Building Presto ${DOCKER_USER}/presto:${PRESTO_VERSION}"
-pushd presto/docker >> ${TEMP_DIR}/docker.presto.${PRESTO_VERSION} 2>&1
+- Building Presto ${DOCKER_USER}/presto:${PRESTO_VERSION}-${HADOOP_VERSION}"
+pushd presto/docker >> ${BUILD_LOG} 2>&1
 docker build \
         --build-arg DOCKER_USER=${DOCKER_USER} \
         --build-arg HADOOP_VERSION=${HADOOP_VERSION} \
         --build-arg PRESTO_VERSION=${PRESTO_VERSION} \
-        --tag ${DOCKER_USER}/presto:${PRESTO_VERSION} . >> ${TEMP_DIR}/docker.presto.${PRESTO_VERSION} 2>&1
+        --tag ${DOCKER_USER}/presto:${PRESTO_VERSION}-${HADOOP_VERSION} . >> ${BUILD_LOG} 2>&1
 
-popd >> ${TEMP_DIR}/docker.presto.${PRESTO_VERSION} 2>&1
+popd >> ${BUILD_LOG} 2>&1
 
 echo "
 - Building Shell Container ${DOCKER_USER}/shell:${HADOOP_VERSION}-${SPARK_VERSION}-${PRESTO_VERSION}"
-pushd shell/docker >> ${TEMP_DIR}/docker.shell.${HADOOP_VERSION}-${SPARK_VERSION}-${PRESTO_VERSION} 2>&1
+pushd shell/docker >> ${BUILD_LOG} 2>&1
 docker build \
         --build-arg DOCKER_USER=${DOCKER_USER} \
+        --build-arg HADOOP_VERSION=${HADOOP_VERSION} \
         --build-arg SPARK_VERSION=${SPARK_VERSION} \
         --build-arg PRESTO_VERSION=${PRESTO_VERSION} \
         --build-arg TTYD_VERSION=${TTYD_VERSION} \
-        --tag ${DOCKER_USER}/shell:${HADOOP_VERSION}-${SPARK_VERSION}-${PRESTO_VERSION} . >> ${TEMP_DIR}/docker.shell.${HADOOP_VERSION}-${SPARK_VERSION}-${PRESTO_VERSION} 2>&1
+        --tag ${DOCKER_USER}/shell:${HADOOP_VERSION}-${SPARK_VERSION}-${PRESTO_VERSION} . >> ${BUILD_LOG} 2>&1
 
-popd >> ${TEMP_DIR}/docker.shell.${HADOOP_VERSION}-${SPARK_VERSION}-${PRESTO_VERSION} 2>&1
+popd >> ${BUILD_LOG} 2>&1
 
 if [ "${RELEASE}" == "1" ]; then
         echo "
         - Pushing images to Docker Hub"
         if [ "${LOGIN}" == "1" ]; then
-                docker login --username $DOCKER_USER --password $DOCKER_PASSWORD >> ${TEMP_DIR}/docker.push.${HADOOP_VERSION}-${SPARK_VERSION}-${PRESTO_VERSION} 2>&1
+                docker login --username $DOCKER_USER --password $DOCKER_PASSWORD >> ${BUILD_LOG} 2>&1
         fi
         for image in "${DOCKER_USER}/base:${BASE_DOCKER_VERSION}" \
                         "${DOCKER_USER}/hadoop:${HADOOP_VERSION}" \
-                        "${DOCKER_USER}/spark:${SPARK_VERSION}" \
-                        "${DOCKER_USER}/zeppelin:${ZEPPELIN_VERSION}" \
-                        "${DOCKER_USER}/presto:${PRESTO_VERSION}" \
+                        "${DOCKER_USER}/spark:${SPARK_VERSION}-${HADOOP_VERSION}" \
+                        "${DOCKER_USER}/zeppelin:${ZEPPELIN_VERSION}-${SPARK_VERSION}-${HADOOP_VERSION}" \
+                        "${DOCKER_USER}/presto:${PRESTO_VERSION}-${HADOOP_VERSION}" \
                         "${DOCKER_USER}/shell:${HADOOP_VERSION}-${SPARK_VERSION}-${PRESTO_VERSION}" ; do
         echo "
         - Pushing $image"
-        docker push $image >> ${TEMP_DIR}/docker.push.${HADOOP_VERSION}-${SPARK_VERSION}-${PRESTO_VERSION} 2>&1
+        docker push $image >> ${BUILD_LOG} 2>&1
         done
         if [ "${LOGIN}" == "1" ]; then
-                docker logout >> ${TEMP_DIR}/docker.push.${HADOOP_VERSION}-${SPARK_VERSION}-${PRESTO_VERSION} 2>&1
+                docker logout >> ${BUILD_LOG} 2>&1
         fi
 fi
 

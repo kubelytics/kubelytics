@@ -1,0 +1,12 @@
+sudo: required
+
+services:
+  - docker
+
+addons:
+  apt:
+    packages:
+      - docker-ce
+
+script:
+  - cd services && BUILD_LOG=/dev/stdout ./build_stack.sh --no-release

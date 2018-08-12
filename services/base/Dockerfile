@@ -11,8 +11,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo 'deb http://deb.debian.org/debian jessie-backports main' > /etc/apt/sources.list.d/jessie-backports.list
-
 RUN { \
         echo '#!/bin/sh'; \
         echo 'set -e'; \
@@ -23,17 +21,15 @@ RUN { \
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre
 
-ENV JAVA_VERSION 8u171
-ENV JAVA_DEBIAN_VERSION 8u171-b11-1~bpo8+1
+ENV JAVA_VERSION 8u181
+ENV JAVA_DEBIAN_VERSION 8u181-b13-1~deb9u1
 
-# see https://bugs.debian.org/775775
-# and https://github.com/docker-library/java/issues/19#issuecomment-70546872
-ENV CA_CERTIFICATES_JAVA_VERSION 20161107~bpo8+1
+ENV CA_CERTIFICATES_JAVA_VERSION 20170531+nmu1
 
 RUN set -x \
     && mkdir -p /usr/share/man/man1 \
     && apt-get update \
-    && apt-get install -y -t jessie-backports \
+    && apt-get install -y --no-install-recommends \
         openjdk-8-jre-headless="$JAVA_DEBIAN_VERSION" \
         ca-certificates-java="$CA_CERTIFICATES_JAVA_VERSION" \
     && rm -rf /var/lib/apt/lists/* \

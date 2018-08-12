@@ -2,7 +2,7 @@ ARG DOCKER_USER
 ARG HADOOP_VERSION
 FROM $DOCKER_USER/hadoop:${HADOOP_VERSION}
 
-ARG MIRROR="http://www-us.apache.org/dist"
+ARG MIRROR="http://archive.apache.org/dist"
 ARG SPARK_VERSION="spark-2.1.2"
 ARG HADOOP_SPARK_VERSION="hadoop2.7"
 ARG SPARK_BIN_NAME="${SPARK_VERSION}-bin-${HADOOP_SPARK_VERSION}"
@@ -12,7 +12,8 @@ USER root
 
 ENV SPARK_HOME /spark
 ENV PATH $PATH:${SPARK_HOME}/bin
-RUN mkdir $SPARK_HOME && \
+RUN set -x && \
+    mkdir $SPARK_HOME && \
     wget --quiet ${SPARK_BIN} && \
     tar xzf ${SPARK_BIN_NAME}.tgz && \
     rm -rf ${SPARK_BIN_NAME}.tgz && \
