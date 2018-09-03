@@ -12,8 +12,8 @@ USER root
 COPY --from=presto /presto/bin/presto /usr/local/bin/presto
 
 RUN set -x && \
-    wget --quiet https://github.com/tsl0922/ttyd/releases/download/$TTYD_VERSION/ttyd-static-amd64 \
-    && mv ttyd-static-amd64 /usr/local/bin/ttyd \
+    wget --quiet https://github.com/tsl0922/ttyd/releases/download/$TTYD_VERSION/ttyd_linux.x86_64 \
+    && mv ttyd_linux.x86_64 /usr/local/bin/ttyd \
     && chmod +x /usr/local/bin/ttyd
 
 EXPOSE 7681
