@@ -14,6 +14,10 @@ SPARK_FULL_VERSION="spark-${SPARK_VERSION}"
 
 ZEPPELIN_VERSION=${ZEPPELIN_VERSION:-"0.8.0"}
 
+JUPYTER_MINICONDA_VERSION=${JUPYTER_MINICONDA_VERSION:-"4.5.11"}
+
+JUPYTER_VERSION=${JUPYTER_VERSION:-"0.9.2"}
+
 PRESTO_VERSION=${PRESTO_VERSION:-"0.203"}
 
 TTYD_VERSION=${TTYD_VERSION:-"1.4.0"}
@@ -48,6 +52,7 @@ Starting Docker Release
         Hadoop Version: ${HADOOP_VERSION}
         Spark Version: ${SPARK_VERSION}
         Zeppelin Version: ${ZEPPELIN_VERSION}
+        Jupyter Version: ${JUPYTER_VERSION}
         Presto Version: ${PRESTO_VERSION}
 
         Logs folder at ${TEMP_DIR}"
@@ -95,6 +100,19 @@ docker build \
 popd >> ${BUILD_LOG} 2>&1
 
 echo "
+- Building Jupyter ML ${DOCKER_USER}/jupyter-ml:${JUPYTER_MINICONDA_VERSION}-${SPARK_VERSION}"
+pushd jupyter/docker >> ${BUILD_LOG} 2>&1
+docker build \
+        --build-arg DOCKER_USER=${DOCKER_USER} \
+        --build-arg HADOOP_VERSION=${HADOOP_VERSION} \
+        --build-arg SPARK_VERSION=${SPARK_VERSION} \
+        --build-arg MINICONDA_VERSION=${JUPYTER_MINICONDA_VERSION} \
+        --build-arg JUPYTER_VERSION=${JUPYTER_VERSION} \
+        --tag ${DOCKER_USER}/jupyter-ml:${JUPYTER_VERSION}-${SPARK_VERSION}-${HADOOP_VERSION} . >> ${BUILD_LOG} 2>&1
+
+popd >> ${BUILD_LOG} 2>&1
+
+echo "
 - Building Presto ${DOCKER_USER}/presto:${PRESTO_VERSION}-${HADOOP_VERSION}"
 pushd presto/docker >> ${BUILD_LOG} 2>&1
 docker build \
@@ -128,6 +146,7 @@ if [ "${RELEASE}" == "1" ]; then
                         "${DOCKER_USER}/hadoop:${HADOOP_VERSION}" \
                         "${DOCKER_USER}/spark:${SPARK_VERSION}-${HADOOP_VERSION}" \
                         "${DOCKER_USER}/zeppelin:${ZEPPELIN_VERSION}-${SPARK_VERSION}-${HADOOP_VERSION}" \
+                        "${DOCKER_USER}/jupyter-ml:${JUPYTER_VERSION}-${SPARK_VERSION}-${HADOOP_VERSION}" \
                         "${DOCKER_USER}/presto:${PRESTO_VERSION}-${HADOOP_VERSION}" \
                         "${DOCKER_USER}/shell:${HADOOP_VERSION}-${SPARK_VERSION}-${PRESTO_VERSION}" ; do
         echo "
