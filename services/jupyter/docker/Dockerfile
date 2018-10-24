@@ -81,6 +81,7 @@ RUN set -x && \
     'jupyterlab==0.35.2' && \
     pip install ipython-sql \
     pyhive[presto] \
+    msgpack \
     nuclio-jupyter \
     nbgitpuller \
     jupyterlab-git && \
