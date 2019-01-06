@@ -2,6 +2,8 @@
 set -e
 
 unset SPARK_MASTER_PORT
+unset ZEPPELIN_PORT
+unset ZEPPELIN_SSL_PORT
 
 if [ "$#" != "2" ]; then
   echo "ERROR: Missing required arguments"

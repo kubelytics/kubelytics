@@ -9,4 +9,4 @@ addons:
       - docker-ce
 
 script:
-  - cd services && BUILD_LOG=/dev/stdout ./build_stack.sh --no-release
+  - cd services && make docker-images
