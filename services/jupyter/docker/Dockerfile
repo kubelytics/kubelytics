@@ -70,6 +70,7 @@ RUN set -x && \
     'pyarrow==0.11.1' \
     'ipython-sql==0.3.8' \
     'nodejs==10.13.0' \
+    'pymysql==0.9.2' \
      && \
     pip install \
     pyhive[presto]==0.6.1 \
