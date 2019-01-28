@@ -71,11 +71,15 @@ RUN set -x && \
     'ipython-sql==0.3.8' \
     'nodejs==10.13.0' \
     'pymysql==0.9.2' \
-     && \
+    'nb_conda_kernels==2.2.0' \
+    && \
     pip install \
     pyhive[presto]==0.6.1 \
     nbgitpuller \
-    jupyterlab-git && \
+    jupyterlab-git \
+    v3io_frames \
+    nuclio-jupyter \
+    && \
     pip install --no-cache-dir \
     https://www-us.apache.org/dist/incubator/toree/0.3.0-incubating/toree-pip/toree-0.3.0.tar.gz && \
     jupyter toree install --sys-prefix && \
@@ -87,7 +91,7 @@ RUN set -x && \
     jupyter labextension install @jupyterlab/toc  && \
     jupyter labextension install @jupyterlab/git  && \
     jupyter serverextension enable --user jupyterlab_discovery  && \
-    jupyter serverextension enable --py jupyterlab_git && \
+    jupyter serverextension enable --py jupyterlab_git --sys-prefix && \
     jupyter serverextension enable --py nbgitpuller --sys-prefix && \
     git clone https://github.com/PAIR-code/facets.git && \
     cd facets && \
