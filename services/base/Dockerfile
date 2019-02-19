@@ -21,17 +21,12 @@ RUN { \
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre
 
-ENV JAVA_VERSION 8u181
-ENV JAVA_DEBIAN_VERSION 8u181-b13-2~deb9u1
-
-ENV CA_CERTIFICATES_JAVA_VERSION 20170531+nmu1
-
 RUN set -x \
     && mkdir -p /usr/share/man/man1 \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-        openjdk-8-jre-headless="$JAVA_DEBIAN_VERSION" \
-        ca-certificates-java="$CA_CERTIFICATES_JAVA_VERSION" \
+        openjdk-8-jre-headless \
+        ca-certificates-java \
     && rm -rf /var/lib/apt/lists/* \
     && [ "$JAVA_HOME" = "$(docker-java-home)" ]
 

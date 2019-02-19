@@ -68,10 +68,11 @@ RUN set -x && \
     'sqlalchemy==1.2.15' \
     'xlrd==1.2.0' \
     'pyarrow==0.11.1' \
-    'ipython-sql==0.3.8' \
+    'ipython-sql==0.3.9' \
     'nodejs==10.13.0' \
     'pymysql==0.9.2' \
     'nb_conda_kernels==2.2.0' \
+    'nb_conda==2.2.1' \
     && \
     pip install \
     pyhive[presto]==0.6.1 \
