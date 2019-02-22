@@ -75,12 +75,12 @@ RUN set -x && \
     'nb_conda==2.2.1' \
     && \
     pip install \
-    pyhive[presto]==0.6.1 \
     nbgitpuller \
     jupyterlab-git \
     v3io_frames \
     nuclio-jupyter \
     && \
+    pip install git+https://github.com/v3io/PyHive.git@v0.6.999 && \
     pip install --no-cache-dir \
     https://www-us.apache.org/dist/incubator/toree/0.3.0-incubating/toree-pip/toree-0.3.0.tar.gz && \
     jupyter toree install --sys-prefix && \
