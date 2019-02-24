@@ -77,7 +77,7 @@ RUN set -x && \
     pip install \
     nbgitpuller \
     jupyterlab-git \
-    v3io_frames \
+    v3io_frames==0.4.2 \
     nuclio-jupyter \
     && \
     pip install git+https://github.com/v3io/PyHive.git@v0.6.999 && \
