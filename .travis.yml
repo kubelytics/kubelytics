@@ -14,5 +14,6 @@ env:
 after_success:
 - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
     docker login -u="${DOCKER_USER}" -p="${DOCKER_PASSWORD}" ;
-    cd services && make docker-images print-images release ;
+    test -d services && cd services ;
+    make docker-images print-images release ;
   fi
