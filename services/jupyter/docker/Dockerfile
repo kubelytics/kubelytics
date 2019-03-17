@@ -48,7 +48,11 @@ RUN set -x && \
       echo 'c.InteractiveShellApp.extensions.append("sql")'; \
       echo 'c.SqlMagic.autocommit=False'; \
 	  } > /etc/ipython/ipython_config.py && \
-    conda install --quiet --yes \
+    chown -R ${CONTAINER_USER}:${CONTAINER_USER} $CONDA_HOME
+
+USER $CONTAINER_USER
+
+RUN conda install --quiet --yes \
     'beautifulsoup4==4.6.3' \
     'bokeh==1.0.3' \
     'cython==0.29.2' \
@@ -67,6 +71,7 @@ RUN set -x && \
     'seaborn==0.9.0' \
     'sqlalchemy==1.2.15' \
     'xlrd==1.2.0' \
+    'boost-cpp==1.69.0' \
     'pyarrow==0.11.1' \
     'ipython-sql==0.3.9' \
     'nodejs==10.13.0' \
@@ -77,8 +82,9 @@ RUN set -x && \
     pip install \
     nbgitpuller \
     jupyterlab-git \
+    tensorflow==1.13.1 \
     v3io_frames==0.4.2 \
-    nuclio-jupyter \
+    nuclio-jupyter==0.6.15 \
     && \
     pip install git+https://github.com/v3io/PyHive.git@v0.6.999 && \
     pip install --no-cache-dir \
@@ -94,11 +100,9 @@ RUN set -x && \
     jupyter serverextension enable --user jupyterlab_discovery  && \
     jupyter serverextension enable --py jupyterlab_git --sys-prefix && \
     jupyter serverextension enable --py nbgitpuller --sys-prefix && \
-    git clone https://github.com/PAIR-code/facets.git && \
-    cd facets && \
-    jupyter nbextension install facets-dist/ --sys-prefix && \
-    cd .. && \
-    rm -rf facets && \
+    git clone https://github.com/PAIR-code/facets.git /tmp/facets && \
+    jupyter nbextension install /tmp/facets/facets-dist/ --sys-prefix && \
+    rm -rf /tmp/facets && \
     MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
     npm cache clean --force && \
     rm -rf $CONDA_HOME/share/jupyter/lab/staging && \
@@ -106,7 +110,4 @@ RUN set -x && \
     conda remove --quiet --yes --force qt pyqt && \
     conda clean -tipsy && \
     rm -rf ${HOME}/.cache && \
-    rm -rf ${HOME}/.node-gyp && \
-    chown -R ${CONTAINER_USER}:${CONTAINER_USER} $CONDA_HOME
-
-USER $CONTAINER_USER
+    rm -rf ${HOME}/.node-gyp

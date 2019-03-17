@@ -1,12 +1,18 @@
 sudo: required
-
 services:
-  - docker
-
+- docker
 addons:
   apt:
     packages:
-      - docker-ce
-
+    - docker-ce
 script:
-  - cd services && make docker-images
+- cd services && make docker-images
+env:
+  global:
+  - secure: egOhNaZe/DZ7BP6P5xBG4ItbbAtNvIYNLeWgId+dF43VSOO29AGSiy0+4JZaA6NkfGJ/Eh3oJ+Xul/eIjc0SFknwFSbkOdEDjHQBqOEL8AAqkJv8lF5J7MM7xVqsRS7vaagUlKh0XsFWsY1nauBNqVKlRTp7Y+V0ROvjadG7N+ZsI9iQOUKvFVvi3C5tQmXkQjS0PDkCY0C0LWbo/sILQ1+r9lLuElQcehGDM1Uec7IliFPf8GEgTGdJiDm3wAMvmzHwiik3wZ7mu2Ynuzud1xhNQPPA6XfSPESIajc1qZ0mRv9Y5eBhKikkhIfawPebkH/FuTwf8mzQZEwBJsGNDEH+qFONvXgVZ3t7NrmPDTsKEB2k8z6EjVJlGpSSBa9YfNEh0aQI5XsS2czdKJPxWoFfsUt97PlJaWU55l8fNCShSdvseNerNngD96mSMqRZlrwd4lIkIqFYGaXagnGCUgOicHWbOfhzK/r/q8Xb01ecSmk6yzCEwPluFMYTNj2YL0QaEzCWc78UMb/R2DuLFL/Px+Vrt5QURVq/aCGqKmBjayiY1dgjEmuxh6fnKrtI/rs8/CI3gQHsSt7s/pTH5/fKow8WCHDidoU0MolYUpP6tWVe4uAqUyMIX8XdCiluPShHsxS9j00bWPryEY/7MH/kdsrWdoieree5lDV9JHo=
+  - secure: KY1f8IVBXOoDKYBoHynBs3E2XPYSBfP+uzfQKN7Etgc9K5p/e2u6oC/XSdnf8EqJVkfleQwt8/eBl6ij0/k9vKgxlRcbdbpQKWnm2iZCFFI2klVBjNbtEOLvA9WZZajAdxVHRpngY7zh0tKsXqieCt2grfd9gviDCRFcuh5Lbn2VSYjsf6oL4Pg/PwIBjCHvdPjaRh+za4G46OM5+lFcc3LRHRB51Nvyd4pAbHFqclSZP9KJ6IjTswSVRNpbdMRKE/sbSTmhyw1pjSzd0cCD5nrGr/q6ESpaUCKnUdLFKNdTtgL3ZZC+X5ZXynE81eH/O9PMlUO4EyPM7JbZwTPil4K9tXg2FSiYlkpD5MFAPRPxrJc1eGEsCm/LIVAZGADphxrmlt6JZDYqV/QZJNKIlXQjDw2ZBZF92dxQXH84uZPrhNEerqd9o6H72BVaM/smvoVRMI/2C+V/Ln6Ue7RhA8gxyaXN7Nj14XjK9KxoFFNhaKDaaC82m1uVqjOR9qmG0/dnc9P64EZTBgbWAXmyLWh2zGx6WpO69B7C52yjNusoSLI7lvQobREftbSUd9UkNsgJC9RK3kdUA9QGiUaFIlptPO7XBT0QIb1TpN6CS7/GW+Ge/VHKsCIwWtbzL5o5oTmKZCv9hSH2/1aHgTHBM3ubtyR9hUAXzdR00WfA+Ag=
+after_success:
+- if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u="${DOCKER_USER}" -p="${DOCKER_PASSWORD}" ;
+    cd services && make docker-images print-images release ;
+  fi
