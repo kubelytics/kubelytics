@@ -19,7 +19,6 @@ RUN set -x && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
     /bin/bash Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_HOME && \
     rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
-    $CONDA_HOME/bin/conda config --system --prepend channels conda-forge && \
     $CONDA_HOME/bin/conda config --system --set auto_update_conda false && \
     $CONDA_HOME/bin/conda config --system --set show_channel_urls true && \
     $CONDA_HOME/bin/conda install --quiet --yes conda=="${MINICONDA_VERSION}" && \
@@ -52,7 +51,7 @@ RUN set -x && \
 
 USER $CONTAINER_USER
 
-RUN conda install --quiet --yes \
+RUN conda install -c anaconda --quiet --yes \
     'beautifulsoup4==4.6.3' \
     'bokeh==1.0.3' \
     'cython==0.29.2' \
@@ -71,15 +70,14 @@ RUN conda install --quiet --yes \
     'seaborn==0.9.0' \
     'sqlalchemy==1.2.15' \
     'xlrd==1.2.0' \
-    'boost-cpp==1.69.0' \
     'pyarrow==0.11.1' \
-    'ipython-sql==0.3.9' \
     'nodejs==10.13.0' \
     'pymysql==0.9.2' \
     'nb_conda_kernels==2.2.0' \
     'nb_conda==2.2.1' \
     && \
     pip install \
+    ipython-sql==0.3.9 \
     nbgitpuller \
     jupyterlab-git \
     tensorflow==1.13.1 \
