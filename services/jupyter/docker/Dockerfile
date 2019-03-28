@@ -82,7 +82,7 @@ RUN conda install -c anaconda --quiet --yes \
     jupyterlab-git \
     tensorflow==1.13.1 \
     v3io_frames==0.4.2 \
-    nuclio-jupyter==0.6.15 \
+    nuclio-jupyter==0.7.0 \
     && \
     pip install git+https://github.com/v3io/PyHive.git@v0.6.999 && \
     pip install --no-cache-dir \
