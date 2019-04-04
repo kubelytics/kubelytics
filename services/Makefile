@@ -4,6 +4,8 @@ DOCKER_IMAGES = \
 	spark \
 	zeppelin \
 	presto \
+	hive \
+	mariadb \
 	shell \
 	jupyter
 
@@ -16,6 +18,8 @@ ZEPPELIN_VERSION ?= 0.8.0
 JUPYTER_MINICONDA_VERSION ?= 4.5.12
 JUPYTER_VERSION ?= 0.9.4
 PRESTO_VERSION ?= 0.206
+HIVE_VERSION ?= 2.3.2
+MARIADB_VERSION ?= 10.4
 TTYD_VERSION ?= 1.4.0
 
 docker-images: $(DOCKER_IMAGES)
@@ -106,7 +110,26 @@ shell:
         --build-arg SPARK_VERSION=$(SPARK_VERSION) \
         --build-arg PRESTO_VERSION=$(PRESTO_VERSION) \
         --build-arg TTYD_VERSION=$(TTYD_VERSION) \
+				--build-arg HIVE_VERSION=$(HIVE_VERSION) \
         --tag $(DOCKER_REPOSITORY)/shell:$(HADOOP_VERSION)-$(SPARK_VERSION)-$(PRESTO_VERSION) .
 	$(eval READY_IMAGES += $(DOCKER_REPOSITORY)/shell:$(HADOOP_VERSION)-$(SPARK_VERSION)-$(PRESTO_VERSION))
+
+hive:
+	@echo Building hive image $(DOCKER_REPOSITORY)/hive:$(HIVE_VERSION)-$(HADOOP_VERSION)
+	@cd hive/docker && \
+	docker build \
+	      --build-arg DOCKER_USER=$(DOCKER_REPOSITORY) \
+	      --build-arg HADOOP_VERSION=$(HADOOP_VERSION) \
+	      --build-arg HIVE_VERSION=$(HIVE_VERSION) \
+	      --tag $(DOCKER_REPOSITORY)/hive:$(HIVE_VERSION)-$(HADOOP_VERSION) .
+	$(eval READY_IMAGES += $(DOCKER_REPOSITORY)/hive:$(HIVE_VERSION)-$(HADOOP_VERSION))
+
+mariadb:
+	@echo Building MariaDB $(DOCKER_REPOSITORY)/mariadb:$(MARIADB_VERSION)
+	@cd mariadb/docker && \
+	docker build \
+        --build-arg MARIADB_VERSION=$(MARIADB_VERSION) \
+        --tag $(DOCKER_REPOSITORY)/mariadb:$(MARIADB_VERSION) .
+	$(eval READY_IMAGES += $(DOCKER_REPOSITORY)/mariadb:$(MARIADB_VERSION))
 
 .PHONY: $(DOCKER_IMAGES)
