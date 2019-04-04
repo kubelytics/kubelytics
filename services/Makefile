@@ -84,12 +84,11 @@ jupyter:
 	@cd jupyter/docker && \
 	docker build \
         --build-arg DOCKER_USER=$(DOCKER_REPOSITORY) \
-        --build-arg HADOOP_VERSION=$(HADOOP_VERSION) \
-        --build-arg SPARK_VERSION=$(SPARK_VERSION) \
+        --build-arg BASE_DOCKER_VERSION=$(BASE_DOCKER_VERSION) \
         --build-arg MINICONDA_VERSION=$(JUPYTER_MINICONDA_VERSION) \
         --build-arg JUPYTER_VERSION=$(JUPYTER_VERSION) \
-        --tag $(DOCKER_REPOSITORY)/jupyter-ml:$(JUPYTER_VERSION)-$(SPARK_VERSION)-$(HADOOP_VERSION) .
-	$(eval READY_IMAGES += $(DOCKER_REPOSITORY)/jupyter-ml:$(JUPYTER_VERSION)-$(SPARK_VERSION)-$(HADOOP_VERSION))
+        --tag $(DOCKER_REPOSITORY)/jupyter:$(JUPYTER_VERSION) .
+	$(eval READY_IMAGES += $(DOCKER_REPOSITORY)/jupyter:$(JUPYTER_VERSION))
 
 presto:
 	@echo Building Presto $(DOCKER_REPOSITORY)/presto:$(PRESTO_VERSION)-$(HADOOP_VERSION)

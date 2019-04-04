@@ -1,7 +1,6 @@
 ARG DOCKER_USER
-ARG HADOOP_VERSION
-ARG SPARK_VERSION
-FROM ${DOCKER_USER}/spark:${SPARK_VERSION}-${HADOOP_VERSION}
+ARG BASE_DOCKER_VERSION
+FROM $DOCKER_USER/base:${BASE_DOCKER_VERSION}
 
 ARG MINICONDA_VERSION="4.5.12"
 ARG PYTHON_VERSION="3.6.8"
@@ -52,42 +51,25 @@ RUN set -x && \
 USER $CONTAINER_USER
 
 RUN conda install -c anaconda --quiet --yes \
+    'tini==0.18.0' \
     'beautifulsoup4==4.6.3' \
     'bokeh==1.0.3' \
     'cython==0.29.2' \
     'jupyterlab==0.35.3' \
-    'keras==2.2.4' \
-    'numba==0.41.0' \
-    'pandas==0.23.4' \
-    'scikit-image==0.14.1' \
-    'scikit-learn==0.20.2' \
-    'tini==0.18.0' \
-    'dill==0.2.8.2' \
     'ipywidgets==7.4.2' \
-    'numexpr==2.6.8' \
-    'patsy==0.5.1' \
-    'sympy==1.3' \
+    'dill==0.2.8.2' \
     'seaborn==0.9.0' \
-    'sqlalchemy==1.2.15' \
-    'xlrd==1.2.0' \
-    'pyarrow==0.11.1' \
     'nodejs==10.13.0' \
-    'pymysql==0.9.2' \
     'nb_conda_kernels==2.2.0' \
     'nb_conda==2.2.1' \
+    'xlrd==1.2.0' \
     && \
     pip install \
-    ipython-sql==0.3.9 \
     nbgitpuller \
     jupyterlab-git \
-    tensorflow==1.13.1 \
     v3io_frames==0.4.2 \
     nuclio-jupyter==0.7.0 \
     && \
-    pip install git+https://github.com/v3io/PyHive.git@v0.6.999 && \
-    pip install --no-cache-dir \
-    https://www-us.apache.org/dist/incubator/toree/0.3.0-incubating/toree-pip/toree-0.3.0.tar.gz && \
-    jupyter toree install --sys-prefix && \
     jupyter notebook --generate-config && \
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     jupyter labextension install @jupyter-widgets/jupyterlab-manager@^0.38.1 && \
