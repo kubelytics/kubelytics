@@ -68,7 +68,7 @@ RUN conda install -c anaconda --quiet --yes \
     nbgitpuller \
     jupyterlab-git \
     v3io_frames==0.4.2 \
-    nuclio-jupyter==0.7.0 \
+    nuclio-jupyter==0.7.2 \
     && \
     jupyter notebook --generate-config && \
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
